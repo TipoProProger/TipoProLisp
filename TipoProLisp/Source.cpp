@@ -24,6 +24,15 @@ Tokenizer* tokenizerFactory(string filePath)
 	return tokenizer;
 }
 
+string tokensToString(std::vector<MarkedToken*> tokens)
+{
+	string answer = "";
+	for (int i(0); i < tokens.size(); i++)
+		answer += tokens[i]->token;
+
+	return answer;
+}
+
 int main()
 {
 	//set cp1251 for debug output
@@ -44,10 +53,48 @@ int main()
 	//Создаем рутовую машину
 	SECD_Machine* machine = new SECD_Machine(nullptr, tokenMarker->getMarkedTokens());
 
-	Cell* buf = machine->eval();
-
+	Cell* buf = machine->eval(machine->codeRegister);
+	cout << "\n\n\n";
+	cout << tokensToString(buf->getData().second) << "\n";
 	return 0;
 }
+
+///Input example
+/*
+(+ 1 (* 2 3) (/ 6 3))
+*/
+/*
+(defun myFunction(a b)
+	(if (= a b)
+		(+ a b 2)
+		(- a b 3)
+	)
+)
+
+(DEFUN c:mp_kub (p1 p2 p3 p4 p5 p6 p7 p8) ; начало функции mp_kub
+  (set p1 (getpoint "\nУкажите базовую точку : ")) ; запрос координат базовой точки
+  (set p2 (polar p1 0 200)) ; определение координат точки р2
+  (set p3 (polar p2 (/ pi 2) 200)) ; определение координат точки р3
+  (set p4 (polar p3 pi 200)) ; определение координат точки р4
+
+  (set p5 (polar p1 (/ pi 4) 200)) ; определение координат точки р5
+  (set p6 (polar p2 (/ pi 4) 200)) ; определение координат точки р6
+  (set p7 (polar p3 (/ pi 4) 200)) ; определение координат точки р7
+  (set p8 (polar p4 (/ pi 4) 200)) ; определение координат точки р8
+
+  (set osm (getvar "osmode")) ; запоминаем привязки пользователя
+  (setvar "osmode" 0) ; отключаем привязки
+
+  (command "_line" p1 p2 p3 p4 p1 "") ; рисуем передную грань
+  (command "_line" p5 p6 p7 p8 p5 "") ; рисуем задную грань
+  (command "_line" p1 p5 "") ; рисуем линию 1-5
+  (command "_line" p2 p6 "") ; рисуем линию 2-6
+  (command "_line" p3 p7 "") ; рисуем линию 3-7
+  (command "_line" p4 p8 "") ; рисуем линию 4-8
+
+  (setvar "osmode" osm) ; возвращает привязки пользователя
+) ; окончание функции
+*/
 
 /*
 #pragma region Draft

@@ -8,7 +8,7 @@
 class Cell
 {
 public:
-	enum { TYPE_DOUDLE = 0, TYPE_FUNC, TYPE_NIL, TYPE_T };
+	enum { TYPE_DOUDLE = 0, TYPE_STRING, TYPE_FUNC, TYPE_NIL, TYPE_T };
 
 	Cell(Cell* cdr, Cell* car)
 	{
@@ -39,7 +39,7 @@ public:
 	{
 		return this->left;
 	}
-	Cell* cons(Cell *left, Cell *right)
+	Cell* cons(Cell* left, Cell* right)
 	{
 		Cell* newCell = new Cell(left, right);
 		return newCell;
@@ -48,33 +48,58 @@ public:
 	{
 		return (this->left == nullptr && this->right == nullptr);
 	}
+	void setData(std::vector<MarkedToken*> tokens, int type = TYPE_FUNC)
+	{
+		clearData();
+		this->TYPE = type;
+		this->tokens = tokens;
+	}
 	void setData(double data)
 	{
-		this->TYPE = TYPE_DOUDLE;
-		this->tokens.push_back(new MarkedToken(std::to_string(data), TOKEN_GROUP_NUMB_CONST));
-	}
-	void setData(std::vector<MarkedToken*> tokens)
-	{
-		this->TYPE = TYPE_FUNC;
-		this->tokens = tokens;
+		std::vector<MarkedToken*> tokens;
+		tokens.push_back(new MarkedToken(std::to_string(data), TOKEN_GROUP_NUMB_CONST));
+		setData(tokens, Cell::TYPE_DOUDLE);
 	}
 	void setData()
 	{
-		this->TYPE = TYPE_NIL;
-		this->tokens.push_back(new MarkedToken("nil", TOKEN_GROUP_DEFINED_WORD));
+		std::vector<MarkedToken*> tokens;
+		tokens.push_back(new MarkedToken("nil", TOKEN_GROUP_DEFINED_WORD));
+		setData(tokens, TYPE_NIL);
+	}
+	void setData(MarkedToken* token)
+	{
+		tokens.push_back(token);
+		setData(tokens, TYPE_STRING);
 	}
 	void setData(bool flag)
 	{
-		this->TYPE = TYPE_T;
-		this->tokens.push_back(new MarkedToken("nil", TOKEN_GROUP_DEFINED_WORD));
+		std::vector<MarkedToken*> tokens;
+		tokens.push_back(new MarkedToken((flag ? "t" : "nil"), TOKEN_GROUP_DEFINED_WORD));
+		setData(tokens, TYPE_T);
 	}
-	
+	void setData(Cell* cell)
+	{
+		this->TYPE = cell->TYPE;
+		this->tokens = cell->tokens;
+	}
+
 	std::pair<int, vector<MarkedToken*> > getData()
 	{
 		std::cout << "Cell getData()\n";
 		return std::make_pair(TYPE, tokens);
 	}
 
+public: void clearData()
+{
+	if (!this->tokens.empty())
+	{
+		for (int i(0); i < this->tokens.size(); ++i)
+		{
+			delete this->tokens[i];
+		}
+		this->tokens.clear();
+	}
+}
 private:
 	Cell* left;
 	Cell* right;
