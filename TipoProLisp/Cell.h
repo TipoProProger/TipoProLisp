@@ -76,7 +76,13 @@ public:
 	void setData(Cell* cell)
 	{
 		this->TYPE = cell->TYPE;
-		this->tokens = cell->tokens;
+		for(int i(0); i < cell->tokens.size(); ++i)
+			this->tokens.push_back(new MarkedToken(cell->tokens[i]));
+	}
+	void setData(std::vector<MarkedToken*> args, std::vector<MarkedToken*> tokens)
+	{
+		setData(tokens);
+		this->args = args;	
 	}
 
 	std::pair<int, vector<MarkedToken*> > getData()
@@ -84,20 +90,27 @@ public:
 		return std::make_pair(TYPE, tokens);
 	}
 
-public: void clearData()
-{
-	if (!this->tokens.empty())
+	void clearData()
 	{
-		for (int i(0); i < this->tokens.size(); ++i)
+		this->args.clear();
+
+		if (!this->tokens.empty())
 		{
-			delete this->tokens[i];
+			for (int i(0); i < this->tokens.size(); ++i)
+			{
+				delete this->tokens[i];
+			}
+			this->tokens.clear();
 		}
-		this->tokens.clear();
 	}
-}
+	vector<MarkedToken*> getArgsNames()
+	{
+		return this->args;
+	}
 private:
 	Cell* left;
 	Cell* right;
 	int TYPE;
 	vector<MarkedToken*> tokens;
+	vector<MarkedToken*> args;
 };

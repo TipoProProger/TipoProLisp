@@ -31,6 +31,12 @@ struct MarkedToken
 	int tokenGroup;
 
 	MarkedToken(string token, int tokenGroup);
+
+	MarkedToken(const MarkedToken* token)
+	{
+		this->token = token->token;
+		this->tokenGroup = token->tokenGroup;
+	}
 };
 
 class TokenMarker

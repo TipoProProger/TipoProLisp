@@ -17,7 +17,7 @@ public:
 		this->dumpRegister = previousMachine;
 	}
 
-	Cell* eval(std::vector<MarkedToken*> codeRegister)
+	Cell* eval(std::vector<MarkedToken*> codeRegister, std::map<string, Cell*> &environmentRegister)
 	{
 		MarkedToken* token = codeRegister[0];
 
@@ -50,7 +50,7 @@ public:
 			{
 				std::vector<MarkedToken*> buffer = getBracers(codeRegister, 0, findBracers(codeRegister));
 
-				return eval(buffer);
+				return eval(buffer, environmentRegister);
 			}
 			else if (token->token == "+")
 			{
@@ -60,7 +60,7 @@ public:
 				buffer->setData((double)0);
 				while (!codeRegister.empty())
 				{
-					addProc(buffer, eval(getFirstElem(codeRegister)));
+					addProc(buffer, eval(getFirstElem(codeRegister), environmentRegister));
 				}
 
 				return buffer;
@@ -70,10 +70,10 @@ public:
 				codeRegister.erase(codeRegister.begin());
 
 				Cell* buffer = new Cell(nullptr, nullptr);
-				buffer->setData(eval(getFirstElem(codeRegister)));
+				buffer->setData(eval(getFirstElem(codeRegister), environmentRegister));
 				while (!codeRegister.empty())
 				{
-					subProc(buffer, eval(getFirstElem(codeRegister)));
+					subProc(buffer, eval(getFirstElem(codeRegister), environmentRegister));
 				}
 
 				return buffer;
@@ -83,10 +83,10 @@ public:
 				codeRegister.erase(codeRegister.begin());
 
 				Cell* buffer = new Cell(nullptr, nullptr);
-				buffer->setData(eval(getFirstElem(codeRegister)));
+				buffer->setData(eval(getFirstElem(codeRegister), environmentRegister));
 				while (!codeRegister.empty())
 				{
-					divProc(buffer, eval(getFirstElem(codeRegister)));
+					divProc(buffer, eval(getFirstElem(codeRegister), environmentRegister));
 				}
 
 				return buffer;
@@ -96,10 +96,10 @@ public:
 				codeRegister.erase(codeRegister.begin());
 
 				Cell* buffer = new Cell(nullptr, nullptr);
-				buffer->setData(eval(getFirstElem(codeRegister)));
+				buffer->setData(eval(getFirstElem(codeRegister), environmentRegister));
 				while (!codeRegister.empty())
 				{
-					mulProc(buffer, eval(getFirstElem(codeRegister)));
+					mulProc(buffer, eval(getFirstElem(codeRegister), environmentRegister));
 				}
 
 				return buffer;
@@ -109,10 +109,10 @@ public:
 				codeRegister.erase(codeRegister.begin());
 
 				Cell* buffer = new Cell(nullptr, nullptr);
-				buffer->setData(eval(getFirstElem(codeRegister)));
+				buffer->setData(eval(getFirstElem(codeRegister), environmentRegister));
 				while (!codeRegister.empty())
 				{
-					buffer = lessProc(buffer, eval(getFirstElem(codeRegister)));
+					buffer = lessProc(buffer, eval(getFirstElem(codeRegister), environmentRegister));
 				}
 
 				return buffer;
@@ -122,10 +122,10 @@ public:
 				codeRegister.erase(codeRegister.begin());
 
 				Cell* buffer = new Cell(nullptr, nullptr);
-				buffer->setData(eval(getFirstElem(codeRegister)));
+				buffer->setData(eval(getFirstElem(codeRegister), environmentRegister));
 				while (!codeRegister.empty())
 				{
-					buffer = lessEquProc(buffer, eval(getFirstElem(codeRegister)));
+					buffer = lessEquProc(buffer, eval(getFirstElem(codeRegister), environmentRegister));
 				}
 
 				return buffer;
@@ -135,10 +135,10 @@ public:
 				codeRegister.erase(codeRegister.begin());
 
 				Cell* buffer = new Cell(nullptr, nullptr);
-				buffer->setData(eval(getFirstElem(codeRegister)));
+				buffer->setData(eval(getFirstElem(codeRegister), environmentRegister));
 				while (!codeRegister.empty())
 				{
-					buffer = equProc(buffer, eval(getFirstElem(codeRegister)));
+					buffer = equProc(buffer, eval(getFirstElem(codeRegister), environmentRegister));
 				}
 
 				return buffer;
@@ -148,10 +148,10 @@ public:
 				codeRegister.erase(codeRegister.begin());
 
 				Cell* buffer = new Cell(nullptr, nullptr);
-				buffer->setData(eval(getFirstElem(codeRegister)));
+				buffer->setData(eval(getFirstElem(codeRegister), environmentRegister));
 				while (!codeRegister.empty())
 				{
-					buffer = moreProc(buffer, eval(getFirstElem(codeRegister)));
+					buffer = moreProc(buffer, eval(getFirstElem(codeRegister), environmentRegister));
 				}
 
 				return buffer;
@@ -161,10 +161,10 @@ public:
 				codeRegister.erase(codeRegister.begin());
 
 				Cell* buffer = new Cell(nullptr, nullptr);
-				buffer->setData(eval(getFirstElem(codeRegister)));
+				buffer->setData(eval(getFirstElem(codeRegister), environmentRegister));
 				while (!codeRegister.empty())
 				{
-					buffer = moreEquProc(buffer, eval(getFirstElem(codeRegister)));
+					buffer = moreEquProc(buffer, eval(getFirstElem(codeRegister), environmentRegister));
 				}
 
 				return buffer;
@@ -174,7 +174,7 @@ public:
 				codeRegister.erase(codeRegister.begin());
 
 				Cell* buffer = new Cell(nullptr, nullptr);
-				buffer->setData(eval(getFirstElem(codeRegister)));
+				buffer->setData(eval(getFirstElem(codeRegister), environmentRegister));
 				buffer = notProc(buffer);
 
 				return buffer;
@@ -187,22 +187,22 @@ public:
 			{
 				codeRegister.erase(codeRegister.begin());
 
-				Cell* cell = eval(getFirstElem(codeRegister));
+				Cell* cell = eval(getFirstElem(codeRegister), environmentRegister);
 				return cell->car();
 			}
 			else if (token->token == "cdr")
 			{
 				codeRegister.erase(codeRegister.begin());
 
-				Cell* cell = eval(getFirstElem(codeRegister));
+				Cell* cell = eval(getFirstElem(codeRegister), environmentRegister);
 				return cell->cdr();
 			}
 			else if (token->token == "cons")
 			{
 				codeRegister.erase(codeRegister.begin());
 
-				Cell* carPart = eval(getFirstElem(codeRegister));
-				Cell* cdrPart = eval(getFirstElem(codeRegister));
+				Cell* carPart = eval(getFirstElem(codeRegister), environmentRegister);
+				Cell* cdrPart = eval(getFirstElem(codeRegister), environmentRegister);
 
 				return new Cell(carPart, cdrPart);
 			}
@@ -210,7 +210,7 @@ public:
 			{
 				codeRegister.erase(codeRegister.begin());
 
-				Cell* cell = eval(getFirstElem(codeRegister));
+				Cell* cell = eval(getFirstElem(codeRegister), environmentRegister);
 
 				Cell* result = new Cell(nullptr, nullptr);
 				if (cell == nullptr)
@@ -225,22 +225,29 @@ public:
 			}
 			else if (token->token == "defun")
 			{
+				codeRegister.erase(codeRegister.begin());
+
 				//function name
-				MarkedToken* funcitonName = codeRegister[1];
+				string functionName = codeRegister[0]->token;
+				codeRegister.erase(codeRegister.begin());
 
 				//args or empty bracers
 				std::vector<MarkedToken*> argsTokens = getBracers(codeRegister, 0, findBracers(codeRegister));
+				
+				std::vector<MarkedToken*> functionBody = getBracers(codeRegister, 0, findBracers(codeRegister));
+				Cell* functionBodyCell = new Cell(nullptr, nullptr);
+				functionBodyCell->setData(argsTokens, functionBody);
 
-				if (!argsTokens.empty())
-				{
-				}
+				environmentRegister.insert(std::make_pair(functionName, functionBodyCell));
+
+				return new Cell(nullptr, nullptr);
 			}
 			else if (token->token == "set")
 			{
 				codeRegister.erase(codeRegister.begin());
 
 				string name = getFirstElem(codeRegister)[0]->token;
-				Cell* cell = eval(getFirstElem(codeRegister));
+				Cell* cell = eval(getFirstElem(codeRegister), environmentRegister);
 
 				environmentRegister.insert(make_pair(name, cell));
 
@@ -251,14 +258,14 @@ public:
 			{
 				codeRegister.erase(codeRegister.begin());
 
-				Cell* ifClause = eval(getFirstElem(codeRegister));
+				Cell* ifClause = eval(getFirstElem(codeRegister), environmentRegister);
 				bool value = getBoolFromToken(ifClause->getData().second[0]);
-				
+
 				std::vector<MarkedToken*> thenClauseTokens = getBracers(codeRegister, 0, findBracers(codeRegister));
 				thenClauseTokens.erase(thenClauseTokens.begin());//then word
 
 				std::vector<MarkedToken*> elseClauseTokens;
-				
+
 				Cell* result = nullptr;
 				if (!codeRegister.empty())
 				{
@@ -267,16 +274,16 @@ public:
 					elseClauseTokens.erase(elseClauseTokens.begin());//else word
 
 					if (value)
-						result = eval(thenClauseTokens);
-					else result = eval(elseClauseTokens);
+						result = eval(thenClauseTokens, environmentRegister);
+					else result = eval(elseClauseTokens, environmentRegister);
 				}
 				else
 				{
 					if (value)
-						result = eval(thenClauseTokens);
+						result = eval(thenClauseTokens, environmentRegister);
 					else result = new Cell(nullptr, nullptr);
-				}				
-				
+				}
+
 				return result;
 			}
 			else if (token->token == "t")
@@ -296,32 +303,60 @@ public:
 		}
 		case TOKEN_GROUP_VARIABLE:
 		{
-			Cell *cell = environmentRegister.find(token->token)->second;
+			Cell* cell = environmentRegister.find(token->token)->second;
+			codeRegister.erase(codeRegister.begin());
+
 			if (cell->getData().first == Cell::TYPE_FUNC)
 			{
 
+				std::vector<Cell*> args;
+				while (!codeRegister.empty())
+				{
+					args.push_back(eval(getFirstElem(codeRegister), environmentRegister));
+				}
+
+				Cell* result = functionCall(cell, args, environmentRegister);
+
+				return result;
 			}
-			else return cell;
+			else 
+			{
+				Cell* answer = new Cell(nullptr, nullptr);
+				answer->setData(cell);
+				return answer;
+			}
 
 			break;
 		}
 		}
 	}
 
-	Cell* run()
+public: Cell* run()
+{
+	Cell* answer = nullptr;
+	while (!this->codeRegister.empty())
 	{
-		Cell* answer = nullptr;
-		while (!this->codeRegister.empty())
-		{
-			if (this->codeRegister[0]->token == "(")
-				answer = eval(getBracers(this->codeRegister, 0, findBracers(this->codeRegister)));
-			else answer = eval(this->codeRegister);
-			
-			std::cout << treePartToString(answer);
-		}
+		if (this->codeRegister[0]->token == "(")
+			answer = eval(getBracers(this->codeRegister, 0, findBracers(this->codeRegister)), environmentRegister);
+		else answer = eval(this->codeRegister, environmentRegister);
 
-		return answer;
+		std::cout << treePartToString(answer);
 	}
+
+	return answer;
+}
+
+private: Cell* functionCall(Cell *function, std::vector<Cell*> args, std::map<string, Cell*> environment)
+{
+	for (int i(0); i < function->getArgsNames().size(); ++i)
+	{
+		if (environment.find(function->getArgsNames()[i]->token) != environment.end())
+			environment[function->getArgsNames()[i]->token] = args[i];
+		else environment.insert(std::make_pair(function->getArgsNames()[i]->token, args[i]));
+	}
+
+	return eval(function->getData().second, environment);
+}
 
 #pragma region Arifmetic functions
 private: void addProc(Cell* a, Cell* b)
@@ -575,7 +610,7 @@ private: int findBracers(std::vector<MarkedToken*> tokens)
 #pragma endregion
 
 #pragma region Cout functions
-private: static string tokensToString(Cell *cell)
+private: static string tokensToString(Cell* cell)
 {
 	std::vector<MarkedToken*> tokens = cell->getData().second;
 

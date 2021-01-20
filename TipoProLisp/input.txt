@@ -18,3 +18,33 @@
 )
 
 (cons (cons 1 t) (cons 0 nil))
+
+(defun kekFunction (a b) 
+	(
+		(+ a b 1)
+	)
+)
+
+(kekFunction 2 3)
+(kekFunction (* 2 2 2) (+ 1 1 1))
+(kekFunction (kekFunction (* 2 2 2) (+ 1 1 1)) (kekFunction (* 2 2 2) (+ 1 1 1)) )
+
+(defun recKek (a)
+	(
+		(if (> a 0)
+			(then (* a (recKek (- a 1) ) )
+			)
+			(else 1
+			)
+		)
+	)
+)
+
+(recKek 1)
+(recKek 2)
+(recKek 3)
+(recKek 4)
+(recKek 5)
+(recKek 6)
+(recKek 7)
+(recKek 8)
