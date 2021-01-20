@@ -24,15 +24,6 @@ Tokenizer* tokenizerFactory(string filePath)
 	return tokenizer;
 }
 
-string tokensToString(std::vector<MarkedToken*> tokens)
-{
-	string answer = "";
-	for (int i(0); i < tokens.size(); i++)
-		answer += tokens[i]->token;
-
-	return answer;
-}
-
 int main()
 {
 	//set cp1251 for debug output
@@ -53,15 +44,16 @@ int main()
 	//Создаем рутовую машину
 	SECD_Machine* machine = new SECD_Machine(nullptr, tokenMarker->getMarkedTokens());
 
-	Cell* buf = machine->eval(machine->codeRegister);
 	cout << "\n\n\n";
-	cout << tokensToString(buf->getData().second) << "\n";
+	Cell* buf = machine->run();
 	return 0;
 }
 
 ///Input example
 /*
-(+ 1 (* 2 3) (/ 6 3))
+(cdr (car (cons (cons (! (= (+ 1 (* 2 3) (/ 6 3)) (* 3 3))) 21) (cons 1 2))))
+(null 1)
+(null (car 1))
 */
 /*
 (defun myFunction(a b)

@@ -10,7 +10,7 @@ class Cell
 public:
 	enum { TYPE_DOUDLE = 0, TYPE_STRING, TYPE_FUNC, TYPE_NIL, TYPE_T };
 
-	Cell(Cell* cdr, Cell* car)
+	Cell(Cell* car, Cell* cdr)
 	{
 		this->left = car;
 		this->right = cdr;
@@ -39,14 +39,10 @@ public:
 	{
 		return this->left;
 	}
-	Cell* cons(Cell* left, Cell* right)
-	{
-		Cell* newCell = new Cell(left, right);
-		return newCell;
-	}
 	bool null()
 	{
-		return (this->left == nullptr && this->right == nullptr);
+		return (this->left == nullptr && this->right == nullptr
+			&& this->tokens.empty());
 	}
 	void setData(std::vector<MarkedToken*> tokens, int type = TYPE_FUNC)
 	{
@@ -85,7 +81,6 @@ public:
 
 	std::pair<int, vector<MarkedToken*> > getData()
 	{
-		std::cout << "Cell getData()\n";
 		return std::make_pair(TYPE, tokens);
 	}
 

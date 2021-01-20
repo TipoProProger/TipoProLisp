@@ -1,1 +1,20 @@
-(! nil)
+(set fuckYou 69)
+(+ fuckYou 1)
+(cdr (car (cons (cons (! (= (+ 1 (* 2 3) (/ 6 3)) (* 3 3))) 21) (cons 1 2))))
+(null 1)
+(null (car 1))
+
+(if (= (+ 2 2) (* 2 2))
+(then (+ fuckYou 1))
+(else (- fuckYou 1))
+)
+
+(if (= (+ 2 2) (* 2 2))
+(then (+ fuckYou 1))
+)
+
+(if (= nil)
+(then t)
+)
+
+(cons (cons 1 t) (cons 0 nil))

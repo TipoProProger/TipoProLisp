@@ -185,15 +185,43 @@ public:
 		{
 			if (token->token == "car")
 			{
+				codeRegister.erase(codeRegister.begin());
+
+				Cell* cell = eval(getFirstElem(codeRegister));
+				return cell->car();
 			}
 			else if (token->token == "cdr")
 			{
+				codeRegister.erase(codeRegister.begin());
+
+				Cell* cell = eval(getFirstElem(codeRegister));
+				return cell->cdr();
 			}
 			else if (token->token == "cons")
 			{
+				codeRegister.erase(codeRegister.begin());
+
+				Cell* carPart = eval(getFirstElem(codeRegister));
+				Cell* cdrPart = eval(getFirstElem(codeRegister));
+
+				return new Cell(carPart, cdrPart);
 			}
 			else if (token->token == "null")
 			{
+				codeRegister.erase(codeRegister.begin());
+
+				Cell* cell = eval(getFirstElem(codeRegister));
+
+				Cell* result = new Cell(nullptr, nullptr);
+				if (cell == nullptr)
+				{
+					result->setData(true);
+				}
+				else
+				{
+					result->setData(cell->null());
+				}
+				return result;
 			}
 			else if (token->token == "defun")
 			{
@@ -201,24 +229,59 @@ public:
 				MarkedToken* funcitonName = codeRegister[1];
 
 				//args or empty bracers
+				std::vector<MarkedToken*> argsTokens = getBracers(codeRegister, 0, findBracers(codeRegister));
 
-
+				if (!argsTokens.empty())
+				{
+				}
 			}
 			else if (token->token == "set")
 			{
+				codeRegister.erase(codeRegister.begin());
+
+				string name = getFirstElem(codeRegister)[0]->token;
+				Cell* cell = eval(getFirstElem(codeRegister));
+
+				environmentRegister.insert(make_pair(name, cell));
+
+				//no return value
+				return new Cell(nullptr, nullptr);
 			}
 			else if (token->token == "if")
 			{
-			}
-			else if (token->token == "then")
-			{
-			}
-			else if (token->token == "else")
-			{
+				codeRegister.erase(codeRegister.begin());
+
+				Cell* ifClause = eval(getFirstElem(codeRegister));
+				bool value = getBoolFromToken(ifClause->getData().second[0]);
+				
+				std::vector<MarkedToken*> thenClauseTokens = getBracers(codeRegister, 0, findBracers(codeRegister));
+				thenClauseTokens.erase(thenClauseTokens.begin());//then word
+
+				std::vector<MarkedToken*> elseClauseTokens;
+				
+				Cell* result = nullptr;
+				if (!codeRegister.empty())
+				{
+					//else exists
+					elseClauseTokens = getBracers(codeRegister, 0, findBracers(codeRegister));
+					elseClauseTokens.erase(elseClauseTokens.begin());//else word
+
+					if (value)
+						result = eval(thenClauseTokens);
+					else result = eval(elseClauseTokens);
+				}
+				else
+				{
+					if (value)
+						result = eval(thenClauseTokens);
+					else result = new Cell(nullptr, nullptr);
+				}				
+				
+				return result;
 			}
 			else if (token->token == "t")
 			{
-				Cell *cell = new Cell(nullptr, nullptr);
+				Cell* cell = new Cell(nullptr, nullptr);
 				cell->setData(true);
 				return cell;
 			}
@@ -233,18 +296,32 @@ public:
 		}
 		case TOKEN_GROUP_VARIABLE:
 		{
-			return environmentRegister.find(token->token)->second;
+			Cell *cell = environmentRegister.find(token->token)->second;
+			if (cell->getData().first == Cell::TYPE_FUNC)
+			{
+
+			}
+			else return cell;
+
 			break;
 		}
 		}
 	}
 
-	void apply()
+	Cell* run()
 	{
+		Cell* answer = nullptr;
+		while (!this->codeRegister.empty())
+		{
+			if (this->codeRegister[0]->token == "(")
+				answer = eval(getBracers(this->codeRegister, 0, findBracers(this->codeRegister)));
+			else answer = eval(this->codeRegister);
+			
+			std::cout << treePartToString(answer);
+		}
 
-		///TODO
+		return answer;
 	}
-
 
 #pragma region Arifmetic functions
 private: void addProc(Cell* a, Cell* b)
@@ -436,6 +513,7 @@ private: Cell* notProc(Cell* a)
 	}
 }
 #pragma endregion
+
 #pragma region Utility functions
 private: std::vector<MarkedToken*> getFirstElem(std::vector<MarkedToken*>& codeRegister)
 {
@@ -493,6 +571,37 @@ private: int findBracers(std::vector<MarkedToken*> tokens)
 	}
 
 	return k;
+}
+#pragma endregion
+
+#pragma region Cout functions
+private: static string tokensToString(Cell *cell)
+{
+	std::vector<MarkedToken*> tokens = cell->getData().second;
+
+	string answer = "";
+	for (int i(0); i < tokens.size(); i++)
+		answer += tokens[i]->token;
+
+	return answer;
+}
+public: static string treePartToString(Cell* root)
+{
+	string answer = treePart(root);
+	if (answer == "")
+		answer = "nil";
+	return answer + "\n";
+}
+private: static string treePart(Cell* root)
+{
+	string cur = tokensToString(root);
+
+	if (root->car() != nullptr)
+		cur += treePart(root->car()) + " ";
+	if (root->cdr() != nullptr)
+		cur += treePart(root->cdr()) + " ";
+
+	return cur;
 }
 #pragma endregion
 
