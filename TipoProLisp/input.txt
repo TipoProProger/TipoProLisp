@@ -48,3 +48,10 @@
 (recKek 6)
 (recKek 7)
 (recKek 8)
+
+(defun myFunction(a b)
+	(if (= a b)
+		(+ a b 2)
+		(- a b 3)
+	)
+)
